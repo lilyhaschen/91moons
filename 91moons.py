@@ -1103,7 +1103,7 @@ MOONS = [
     }
 ]
 TOKEN = os.environ.get("DISCORD_TOKEN")
-user_moons = {}
+user_moons = {}  # Tracks which moon each user is on
 
 class MoonsBot(discord.Client):
     def __init__(self):
@@ -1116,11 +1116,20 @@ class MoonsBot(discord.Client):
         async def moon(interaction: discord.Interaction):
             user_id = str(interaction.user.id)
             moon_num = user_moons.get(user_id, 0)
-            moon = MOONS[moon_num % len(MOONS)]  # wrap around after 91
+
+            # If the user is at 91, loop or send an ending message (change this as you like)
+            if moon_num >= len(MOONS):
+                await interaction.response.send_message(
+                    "You have completed all 91 moons! 🌙 If you'd like to restart, let me know.",
+                    ephemeral=True
+                )
+                return
+
+            moon = MOONS[moon_num]
 
             # Build the reply
             out = [
-                f"**{moon['name']}**\n",
+                f"**{moon['name']}** (Moon {moon_num + 1} of 91)\n",
                 f"**Vision:** {moon['vision']}\n",
                 f"**Mission:** {moon['mission']}\n",
             ]
